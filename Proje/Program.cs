@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Proje.BAL.Abstract;
 using Proje.BAL.Concrate;
@@ -14,18 +15,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
-// Add services to the container.-
-//DAL-EFCore baglantisi
-builder.Services.AddScoped<IAppUserDAL, EFCoreAppUserDAL>();
-builder.Services.AddScoped<IAppRoleDAL, EFCoreAppRoleDAL>();
-
-//Manager-Service baglantisi
-builder.Services.AddScoped<IAppUserService, AppUserManager>();
-builder.Services.AddScoped<IAppRoleService, AppRoleManager>();
-// For Entity Framework
-builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("maskZekaDatabase")));
-
-IServiceCollection serviceCollection = builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnStr")));
+builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnStr")));
 
 // For Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -62,6 +52,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add services to the container.-
+builder.Services.AddHttpContextAccessor();
+//DAL-EFCore baglantisi
+builder.Services.AddScoped<IAppUserDAL, EFCoreAppUserDAL>();
+builder.Services.AddScoped<IAppRoleDAL, EFCoreAppRoleDAL>();
+
+//Manager-Service baglantisi
+builder.Services.AddScoped<IAppUserService, AppUserManager>();
+builder.Services.AddScoped<IAppRoleService, AppRoleManager>();
+// For Entity Framework 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -80,5 +81,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();
