@@ -71,14 +71,18 @@ namespace Proje.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
                 AppUser user = new()
-                {
+                {   Id = Guid.NewGuid().ToString(),
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Gender = model.Gender,
+                    UserName = model.UserName,
                     Email = model.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                     return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-                return Unauthorized(result);
+                return Ok(result);
             }
 
             [HttpPost]

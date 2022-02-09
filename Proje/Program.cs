@@ -10,15 +10,16 @@ using Proje.BAL.Concrate;
 using Proje.DAL.Abstract;
 using Proje.DAL.Concrate;
 using Proje.Entities.Identity;
+using sun.security.jca;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
-builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnStr")));
+builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnStr"),b=>b.MigrationsAssembly("Proje"))); ;
 
 // For Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<AppUser, AppRole>()
     .AddEntityFrameworkStores<AppIdentityDbContext>()
     .AddDefaultTokenProviders();
 
@@ -30,7 +31,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-
+ 
 
 // Adding Jwt Bearer
 .AddJwtBearer(options =>
